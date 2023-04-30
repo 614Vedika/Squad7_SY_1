@@ -1,0 +1,447 @@
+﻿//Problem Statement : Minimizing the cash flow for expenses among a group of friends
+//UCE2021609 : Monali Borekar
+//UCE2021611 : Felicia Carvalho
+//UCE2021613 : Charu Tiwari
+//UCE2021614 : Vedika Chavan
+
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
+
+import java.util.Scanner;
+
+
+//class for info of friends
+class Fnode
+{ //variable declaration
+double money;
+double mean;
+String name;
+String phno;
+double balance;
+int pin;
+double roundMean;
+double give = 0;
+double receive = 0;
+double finalAmount = 0 ;
+}
+
+
+//class for methods
+class Cashflow
+{
+//objects of Scanner class
+Scanner sc=new Scanner(System.in);
+Scanner sc1=new Scanner(System.in);
+Fnode friends[];
+
+
+int n;
+int mxDebit ,mxCredit;
+double min;
+int x = 0;
+
+
+double f_graph[][];//2d matrix
+
+
+//Accept Bill Payment
+void acceptBillDetails()
+{
+double sum = 0;
+ for(int i=0;i<n;i++)
+ {
+ System.out.println("Enter amount paid by "+friends[i].name);
+ friends[i].money = sc.nextFloat();
+ sum+=friends[i].money;
+ friends[i].mean = friends[i].money/n;
+ BigDecimal bd=new BigDecimal(friends[i].mean).setScale(2,RoundingMode.HALF_DOWN);
+ friends[i].roundMean = bd.doubleValue();
+ }
+ 
+
+
+  //adjacency matrix
+  for(int i=0;i<n;i++)
+  {
+ for(int j=0;j<n;j++)
+ {
+ if(i==j)
+ {
+ f_graph[i][j]=0;
+ }
+ else
+ {
+ f_graph[j][i]=friends[i].roundMean;
+ }
+ }
+  }
+ 
+  //Display Bill Details
+ 
+  System.out.println("\nDetails of friends and expenses");
+  for(int i=0;i<n;i++)
+  {
+ System.out.println("\nDetails of friend "+(i+1));
+ System.out.println("Name : "+friends[i].name);
+ System.out.println("Amount spent : "+friends[i].money);
+ System.out.println("Divided amount : "+friends[i].mean);
+ System.out.println("---------------------------------------------------------");
+  }
+  System.out.println("\nTotal money spent by all is Rs"+sum);
+  System.out.println("Individually each one has to spend Rs"+(sum/n));
+  System.out.println("\nAfter performing calculations, following are the necessary transactions:");
+ 
+ 
+ //Minimize cash Flow Function
+ minCashFlow(f_graph);
+  }
+ 
+
+
+//method to details of friends
+  void acceptBankDetails()
+  {
+ System.out.println("Enter number of friends");
+ n=sc.nextInt();
+ friends = new Fnode [n];
+ f_graph = new double[n+1][n+1];
+ 
+ for(int i=0;i<n;i++)
+ {
+ friends[i] = new Fnode();
+ System.out.println("\nEnter Name of Friend : " +(i+1));
+ friends[i].name = sc1.nextLine();
+ System.out.println("Enter bank Balance");
+ friends[i].balance = sc.nextDouble();
+ 
+ do
+ {
+ System.out.println("Enter 4 digit pin");
+ friends[i].pin = sc.nextInt();
+ }while((int)(Math.log10(friends[i].pin)+1) != 4);
+
+
+ do
+ {
+ System.out.println("Enter Mobile Number");
+ friends[i].phno = sc.next();
+ }while(friends[i].phno.length() != 10);
+ 
+ System.out.println("Details accepted successfully");
+ System.out.println("---------------------------------------------------------");
+ }
+  }
+ 
+ 
+  //displaying info
+  void displayBankDetails()
+  {
+ for (int i=0; i<n; i++)
+ {  System.out.println("FRIEND "+(i+1));
+ System.out.println("Name : "+friends[i].name);
+ System.out.println("Amount spent earlier : "+friends[i].money);
+   System.out.println("-----After transactions:-----");
+   System.out.println("Amount given : "+friends[i].give);
+   System.out.println("Amount received : "+friends[i].receive);
+ 
+  if(friends[i].receive>friends[i].give)
+  {
+  friends[i].finalAmount += friends[i].money - friends[i].receive;        
+  }
+  else
+  {
+  friends[i].finalAmount += friends[i].money + friends[i].give;
+  }
+  System.out.println("Final amount spent after give and take:Rs"+friends[i].finalAmount);
+
+
+ System.out.println("---------------------------------------------------------");
+ }
+ 
+  }
+ 
+ 
+ 
+  //index at which minimum amount is present
+  int getMin(double arr[])
+  {
+int minInd = 0;
+for (int i = 1; i < n; i++)
+if (arr[i] < arr[minInd])
+minInd = i;
+return minInd;
+  }
+ 
+   int getMax(double arr[])
+   {
+int maxInd = 0;
+for (int i = 1; i < n; i++)
+if (arr[i] > arr[maxInd])
+maxInd = i;
+return maxInd;
+   }
+   
+// returns minimum of 2 values
+   double minOf2(double x, double y)
+   {
+  return (x < y) ? x: y;
+   }
+   
+   
+   
+   //recursive function
+    void minCashFlowRec(double amount[])
+{
+   mxCredit = getMax(amount);
+   mxDebit = getMin(amount);
+  if (amount[mxCredit] == 0 && amount[mxDebit] == 0)
+ return;
+
+
+// Find the minimum of two amounts
+   min = minOf2(-amount[mxDebit], amount[mxCredit]);
+amount[mxCredit] -= min;
+amount[mxDebit] += min;
+
+
+// If minimum is the maximum amount to be
+
+
+System.out.println("\n------------------Transaction "+(x+1)+"---------------------------------------");
+System.out.println(friends[mxDebit].name + " has to pay " + min+ " to " + friends[mxCredit].name);
+friends[mxDebit].give = friends[mxDebit].give + min;
+friends[mxCredit].receive = friends[mxCredit].receive+min;
+x++;
+
+
+
+
+minCashFlowRec(amount);//recursive method call
+
+
+}
+   
+   
+   
+  //method for initiating transactions    
+void pay()
+    {
+    System.out.println("Enter your name :");
+    String inputname = sc.next();
+    String receiver = null;
+    int f1 = 0;
+    int f2 = 0;
+    for(int i=0;i<n;i++)
+    {
+    if(inputname.equalsIgnoreCase(friends[i].name))
+    {
+    f1 = 1;
+    System.out.println("Enter receiver's name :");
+    receiver = sc.next();
+    for(int j=0;j<n;j++)
+    {
+    if(receiver.equalsIgnoreCase(friends[j].name))
+    { f2 = 1;
+    System.out.println("Enter amount to be credited to the account of "+friends[j].name);
+    double amt = sc.nextDouble();
+    if((friends[i].balance-amt)<500)
+    {
+    System.out.println("Sorry, cannot initiate the transaction as minimum balance after transaction should be Rs500");
+   
+    }
+    else
+    {
+    int count = 0; int enteredPin; int flag = 0;
+    Scanner sc = new Scanner(System.in);
+    do {
+     System.out.println("Please enter correct account Pin : ");
+     enteredPin =sc.nextInt(); count++;
+     }
+    while ((friends[i].pin!=enteredPin) &&
+     count!=3);
+     
+     if (friends[i].pin==(enteredPin)) {
+     System.out.println( "---------------------------------------------------------");
+     System.out.println("Correct PIN detected");
+   
+    friends[i].balance -= amt;
+    friends[j].balance += amt;
+    System.out.println("-----Transaction Complete-----");
+    System.out.println("Amount of Rs"+amt+" debited from your account");
+    System.out.println("Amount of Rs"+amt+" credited to "+friends[j].name);
+    System.out.println("Current balance : Rs"+friends[i].balance);
+   
+   
+   
+    System.out.println(
+     "---------------------------------------------------------");
+    flag = 1;
+    enteredPin = 0;
+    }
+     
+     if (flag == 0) { System.out.println(
+    "---------------------------------------------------------");
+     System.out.println("Transaction Unsuccessful\nYou have exceeded the limit of the wrong PIN.\nTry again in 24 Hours"
+     ); System.out.println(
+     "---------------------------------------------------------"); }
+   
+    }
+    }
+   
+   
+   
+    }
+    }
+   
+    }
+    //account not found
+    if(f1 == 0)
+    {
+    System.out.println("Account with name "+inputname+" not found");
+    }
+    if(f2 == 0)
+    {
+    System.out.println("Account with name "+receiver+" not found");
+
+
+    }
+    }
+
+
+
+
+//function
+ void minCashFlow(double f_graph[][])
+     {
+    double amount[]=new double[n];
+ 
+    for (int p = 0; p < n; p++)
+    for (int i = 0; i < n; i++)
+    amount[p] += (f_graph[i][p] - f_graph[p][i]);
+ 
+    minCashFlowRec(amount);
+  }
+     
+ 
+ //function to check balance
+ void checkBalance()
+     {
+    int id = 100;
+    int flag = 0;
+    int count = 0;
+   
+    System.out.println("---------------------------------------------");
+    System.out.println("Check your Bank Balance");
+    System.out.println("Enter your Name");
+    String inputName = sc1.nextLine();
+   
+    for (int i=0; i<n; i++)
+    {
+    if (friends[i].name.equalsIgnoreCase(inputName))
+    {
+    System.out.println("Account found");
+    id = i;
+    flag = 1;
+    break;
+    }
+    }
+   
+    if (flag == 0)
+  {
+  System.out.println("---------------------------------------------------------");
+  System.out.println("No Account found by the name : "+inputName);
+  System.out.println("---------------------------------------------------------");
+  }
+   
+    do
+    {
+    System.out.println("Enter correct PIN");
+        int inputPin = sc.nextInt();
+        if(friends[id].pin==inputPin)
+        {
+        flag = 1;
+        System.out.println("---------------------------------------------------------");
+        System.out.println("Correct PIN detected");
+        System.out.println("Bank Balance : "+friends[id].balance);
+        break;
+        }
+       
+        else
+        {
+        count++;
+        }
+       
+    }while (flag != 1 || count != 3);
+   
+    if (flag == 0)
+    {
+    System.out.println("---------------------------------------------------------");
+    System.out.println("Transaction Unsuccessful\nYou have exceeded the limit of the wrong PIN.\nTry again in 24 Hours");
+    System.out.println("---------------------------------------------------------");
+    }
+   
+     }
+     
+}
+
+
+public class Main
+{
+public static void main (String args [])
+{
+Cashflow cf = new Cashflow();
+Scanner kb = new Scanner (System.in);
+System.out.println("PROBLEM STATEMENT : Minimizing the cash flow for expenses among a group of friends");
+System.out.println("UCE2021609 : Monali Borekar\nUCE2021611 : Felicia Carvalho\nUCE2021613 : Charu Tiwari\nUCE2021614 : Vedika Chavan");
+
+
+
+
+System.out.println("\n\n------------Accepting details of friends----------");
+cf.acceptBankDetails();
+int option;
+
+
+do
+{
+//menu
+System.out.println("---------------------------------------------------------");
+System.out.println("Choose from the following operations\n0. Exit\n1. Split money\n2. View details of cashflow \n3. Check Bank Balance\n4. Perform transactions\n");
+option = kb.nextInt();
+
+
+switch(option)
+{
+case 1://accepting details
+cf.acceptBillDetails();
+break;
+
+
+case 2: //displaying details of minimum cash flow
+cf.displayBankDetails();
+break;
+
+
+case 3://balance check
+cf.checkBalance();
+break;
+
+
+case 4: //making transactions
+cf.pay();
+break;
+
+
+default :
+if(option !=0)
+System.out.println("Option does not exist");
+}
+} while (option!=0);
+System.out.println("Thank you !!\nPROGRAM TERMINATED");
+kb.close();
+
+
+}
+}//end of program
